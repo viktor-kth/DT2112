@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "KTH_SR"
+description = "TEMPLATE_DESCRIPTION"
+version = "0.1"
+dependencies = [
+    "plotnine",
+    "scipy",
+    "numpy",
+    "pandas",
+    "yt-dlp",
+    "pydub",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pip-tools",
+    "click",
+    "black[jupyter]",
+    "nbconvert",
+    "ruff",
+    "pre-commit",
+    "pytest",
+    "ipykernel",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff.lint.isort]
+known-local-folder = ["KTH_SR"]
