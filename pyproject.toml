@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "KTH_SR"
-description = "TEMPLATE_DESCRIPTION"
+description = "This is a project for the course DT2112 Speech processing at KTH."
 version = "0.1"
 dependencies = [
     "plotnine",
