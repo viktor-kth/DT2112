@@ -7,8 +7,11 @@ __pycache__/
 *.so
 
 data/*
-!data/.gitkeep
+!data/test.csv
+!data/dev.csv
 .DS_Store
+
+*.zip
 
 # Distribution / packaging
 .Python
