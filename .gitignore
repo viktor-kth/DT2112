@@ -7,6 +7,7 @@ __pycache__/
 *.so
 
 data/*
+!data/vox2_meta.csv
 !data/test.csv
 !data/dev.csv
 .DS_Store
