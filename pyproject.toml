@@ -6,13 +6,18 @@ build-backend = "setuptools.build_meta"
 name = "KTH_SR"
 description = "This is a project for the course DT2112 Speech processing at KTH."
 version = "0.1"
+requires-python = ">=3.9, <3.12"
 dependencies = [
     "plotnine",
     "scipy",
-    "numpy",
+    "numpy<2",
     "pandas",
     "yt-dlp",
     "pydub",
+    # embedding model
+    "deep-speaker @ git+https://github.com/philipperemy/deep-speaker.git@master#egg=deep-speaker",
+    "tensorflow==2.14.0",
+    "gdown",
 ]
 
 [project.optional-dependencies]
