@@ -39,12 +39,15 @@ class FAISS:
             for i, meta in enumerate(metadata):
                 self.metadata.append(meta)
 
-    def search(self, embedding: list, k: int):
+    def search(self, embedding: list, k: int) -> tuple:
         """Search for the k nearest vectors to the given embedding.
 
         Args:
             embedding (list): Embedding to search for.
             k (int): Number of nearest vectors to return.
+
+        Returns:
+            tuple: Tuple of distances and metadata.
         """
         distances, indices = self.vstore.search(embedding, k)
         metadata = [self.metadata[i] for i in indices[0]]
