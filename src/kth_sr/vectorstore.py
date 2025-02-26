@@ -1,3 +1,4 @@
+from __future__ import annotations
 import faiss
 from pathlib import Path
 import json
@@ -14,8 +15,6 @@ class FAISS:
     def __init__(self, dimension):
         self.vstore = faiss.IndexFlatL2(dimension)
         self.metadata = []
-
-    pass
 
     def add(self, vectors: list, metadata: list | None = None):
         """Add a vectors to the store.
@@ -64,11 +63,14 @@ class FAISS:
             json.dump(self.metadata, f)
 
     @classmethod
-    def load(cls, path: str):
+    def load(cls, path: str) -> FAISS:
         """Load the vector store from a file.
 
         Args:
             path (str): Path to load the vector store.
+
+        Returns:
+            FAISS: Vector store object
         """
         dir_path = Path(path)
 
