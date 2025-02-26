@@ -2,19 +2,20 @@ from __future__ import annotations
 import faiss
 from pathlib import Path
 import json
+import numpy as np
 
 
 class FAISS:
     """Vector store using FAISS library."""
 
-    vstore: faiss.IndexFlatL2
+    _vstore: faiss.IndexFlatL2
     """Vector store using FAISS library."""
-    metadata: list
+    _metadata: list
     """Metadata for the vectors stored"""
 
     def __init__(self, dimension):
-        self.vstore = faiss.IndexFlatL2(dimension)
-        self.metadata = []
+        self._vstore = faiss.IndexFlatL2(dimension)
+        self._metadata = []
 
     def add(self, vectors: list, metadata: list | None = None):
         """Add a vectors to the store.
@@ -31,28 +32,35 @@ class FAISS:
         if metadata and len(vectors) != len(metadata):
             raise ValueError("Length of metadata should be same as length of vectors.")
 
+        if not isinstance(vectors, np.ndarray):
+            vectors = np.array(vectors)
+
         # Add vectors to the store
-        self.vstore.add(vectors)
+        self._vstore.add(vectors)
 
         # Add metadata to the store
         if metadata is not None:
-            self.metadata.extend(metadata)
+            self._metadata.extend(metadata)
         else:
-            self.metadata.extend([None] * len(vectors))
+            self._metadata.extend([None] * len(vectors))
 
-    def search(self, embedding: list, k: int) -> tuple:
+    def search(self, embeddings: list, k: int) -> tuple[np.ndarray, np.ndarray]:
         """Search for the k nearest vectors to the given embedding.
 
         Args:
-            embedding (list): Embedding to search for.
+            embeddings (list): List of embeddings to search for.
             k (int): Number of nearest vectors to return.
 
         Returns:
             tuple: Tuple of distances and metadata.
         """
-        distances, indices = self.vstore.search(embedding, k)
-        metadata = [self.metadata[i] for i in indices[0]]
-        return distances, metadata
+        if not isinstance(embeddings, np.ndarray):
+            embeddings = np.array(embeddings)
+
+        distances, indices = self._vstore.search(embeddings, k)
+        # indices are 2 dimensional array. Each row for each query.
+        metadata = [[self._metadata[i] for i in row] for row in indices]
+        return distances, np.array(metadata)
 
     def save(self, path: str):
         """Save the vector store to a file.
@@ -62,9 +70,9 @@ class FAISS:
         """
         dir_path = Path(path)
         dir_path.mkdir(parents=True, exist_ok=True)
-        faiss.write_index(self.vstore, f"{path}/vector_store.index")
+        faiss.write_index(self._vstore, f"{path}/vector_store.index")
         with open(dir_path / "metadata.json", "w") as f:
-            json.dump(self.metadata, f)
+            json.dump(self._metadata, f)
 
     @classmethod
     def load(cls, path: str) -> FAISS:
@@ -79,7 +87,7 @@ class FAISS:
         dir_path = Path(path)
 
         vector_store = FAISS(64)
-        vector_store.vstore = faiss.read_index(f"{path}/vector_store.index")
+        vector_store._vstore = faiss.read_index(f"{path}/vector_store.index")
         with open(dir_path / "metadata.json", "r") as f:
-            vector_store.metadata = json.load(f)
+            vector_store._metadata = json.load(f)
         return vector_store
