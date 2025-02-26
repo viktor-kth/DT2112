@@ -6,12 +6,18 @@ import shutil
 
 @pytest.mark.parametrize(
     "dimension, array, metadata",
-    [(2, [[1, 2], [3, 4]], ["a", "b"]), (3, [[1, 2, 3], [4, 5, 6]], ["a", "b"])],
+    [
+        (2, [[1, 2], [3, 4]], ["a", "b"]),
+        (3, [[1, 2, 3], [4, 5, 6]], ["a", "b"]),
+        (2, [[1, 2], [3, 4]], None),
+    ],
 )
 def test_add_vectors(dimension, array, metadata):
     vstore = FAISS(dimension)
     vectors = np.array(array)
     vstore.add(vectors, metadata)
+    if metadata is None:
+        metadata = [None] * len(array)
     assert vstore.metadata == metadata
     assert vstore.vstore.ntotal == len(array)
 
