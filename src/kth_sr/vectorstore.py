@@ -37,6 +37,8 @@ class FAISS:
         # Add metadata to the store
         if metadata is not None:
             self.metadata.extend(metadata)
+        else:
+            self.metadata.extend([None] * len(vectors))
 
     def search(self, embedding: list, k: int) -> tuple:
         """Search for the k nearest vectors to the given embedding.
