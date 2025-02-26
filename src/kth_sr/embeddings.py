@@ -3,7 +3,7 @@ import gdown
 from deep_speaker.conv_models import DeepSpeakerModel
 
 
-def get_embeddings(
+def get_embedding_model(
     model_out_path: str = "data/ResCNN_triplet_training_checkpoint_265.h5",
 ) -> DeepSpeakerModel:
     """Load pre-trained embedding model Deep Speaker from Google Drive.
