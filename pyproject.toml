@@ -18,6 +18,7 @@ dependencies = [
     "deep-speaker @ git+https://github.com/philipperemy/deep-speaker.git@master#egg=deep-speaker",
     "tensorflow==2.14.0",
     "gdown",
+    "faiss-cpu",
 ]
 
 [project.optional-dependencies]
