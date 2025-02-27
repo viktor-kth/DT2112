@@ -22,6 +22,21 @@ def test_add_vectors(dimension, array, metadata):
     assert vstore._vstore.ntotal == len(array)
 
 
+@pytest.mark.parametrize(
+    "dimension, array, metadata",
+    [
+        (3, [[1, 2], [3, 4]], ["a", "b"]),  # invalid dimension (AssertionError)
+        (2, [[1, 2], [3, 4]], ["a"]),  # invalid metadata
+        (2, [[1, 2]], ["a", "b"]),  # invalid metadata
+    ],
+)
+def test_add_vectors_invalid(dimension, array, metadata):
+    vstore = FAISS(dimension)
+    # raises ValueError or AssertionError
+    with pytest.raises((ValueError, AssertionError)):
+        vstore.add(array, metadata)
+
+
 def test_save_load():
     tmp_path = "./tmp_faiss"
     vectors = np.array([[1, 2], [3, 4]])
