@@ -17,11 +17,11 @@ class FAISS:
         self._vstore = faiss.IndexFlatL2(dimension)
         self._metadata = []
 
-    def add(self, vectors: list, metadata: list | None = None):
+    def add(self, vectors: np.ndarray, metadata: list | None = None):
         """Add a vectors to the store.
 
         Args:
-            vectors (list): List of vectors to be added.
+            vectors (np.ndarray): List of vectors to be added.
             metadata (list, optional): List of metadata for the vectors. Defaults to None.
 
         Raises:
@@ -53,6 +53,20 @@ class FAISS:
 
         Returns:
             tuple: Tuple of distances and metadata.
+
+        Examples:
+            Create template vector store
+            >>> from kth_sr.vectorstore import FAISS
+            >>> vstore = FAISS(2)
+            >>> vstore.add([[1, 2], [3, 4]], ["a", "b"])
+
+            Search for the nearest vector to `[1, 2]`
+            >>> vstore.search([[1, 2]], 1)
+            (array([[0.]]), array([['a']]))  # distance, metadata
+
+            Search for the 2 nearest vectors to vectors `[1, 2]` and `[3, 4]`
+            >>> vstore.search([[1, 2], [3, 4]], 2)
+            (array([[0., 8.], [0., 8.]]), array([['a', 'b'], ['b', 'a']]))  # distance, metadata
         """
         if not isinstance(embeddings, np.ndarray):
             embeddings = np.array(embeddings)
