@@ -17,11 +17,11 @@ class FAISS:
         self._vstore = faiss.IndexFlatL2(dimension)
         self._metadata = []
 
-    def add(self, vectors: np.ndarray, metadata: list | None = None):
+    def add(self, vectors: list, metadata: list | None = None):
         """Add a vectors to the store.
 
         Args:
-            vectors (np.ndarray): List of vectors to be added.
+            vectors (list): List of vectors to be added.
             metadata (list, optional): List of metadata for the vectors. Defaults to None.
 
         Raises:
