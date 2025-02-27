@@ -68,11 +68,11 @@ class FAISS:
 
             Search for the nearest vector to `[1, 2]`
             >>> vstore.search([[1, 2]], 1)
-            (array([[0.]]), array([['a']]))  # distance, metadata
+            ([array([0.]], [['a']])  # distance, metadata
 
             Search for the 2 nearest vectors to vectors `[1, 2]` and `[3, 4]`
             >>> vstore.search([[1, 2], [3, 4]], 2)
-            (array([[0., 8.], [0., 8.]]), array([['a', 'b'], ['b', 'a']]))  # distance, metadata
+            ([array([0., 8.]), array([0., 8.])], [['a', 'b'], ['b', 'a']])  # distance, metadata
         """
         if not isinstance(embeddings, np.ndarray):
             embeddings = np.array(embeddings)
@@ -118,13 +118,13 @@ class FAISS:
 
     @classmethod
     def apply_threshold(
-        cls, distances: np.ndarray, metadata: np.ndarray, threshold: float
+        cls, distances: np.ndarray, metadata: list, threshold: float
     ) -> tuple[list[np.ndarray], list[np.ndarray]]:
         """Apply threshold to the search results.
 
         Args:
             distances (np.ndarray): Distances of the search results.
-            metadata (np.ndarray): Metadata of the search results.
+            metadata (list): Metadata of the search results.
             threshold (float): Threshold to filter the search results.
 
         Returns:
@@ -135,11 +135,16 @@ class FAISS:
 
         Examples:
             >>> from kth_sr.vectorstore import FAISS
-            >>> distances = np.array([[0, 4], [0, 8]])
-            >>> metadata = np.array([['a', 'b'], ['c', 'd']])
+            >>> distances = [[0, 4], [0, 8]]
+            >>> metadata = [['a', 'b'], ['c', 'd']]
             >>> FAISS.apply_threshold(distances, metadata, 5)
-            ([array([0., 4.]), array([0.])], [array(['a', 'b']), array(['c'])])
+            ([array([0., 4.]), array([0.])], [['a', 'b'], ['c']])  # distance, metadata
         """
+        if len(distances) != len(metadata):
+            raise ValueError(
+                "Length of metadata should be same as length of distances."
+            )
+
         if not isinstance(distances, np.ndarray):
             distances = np.array(distances)
 
