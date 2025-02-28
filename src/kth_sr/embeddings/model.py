@@ -65,7 +65,8 @@ class EmbeddingModel:
         self.k = k
 
     def embed(self, audios: list[np.ndarray], sample_rate: int) -> np.ndarray:
-        """Embed an audio file using the pre-trained model and strategy.
+        """Embed an audio signals using the pre-trained model to get the embeddings
+        and then apply the strategy to combine the embeddings.
 
         Args:
             audio (list[np.ndarray]): List of audio arrays. Each audio array is a numpy array.
@@ -74,10 +75,56 @@ class EmbeddingModel:
         Returns:
             np.ndarray: Embedding of the audio.
         """
+        windows = self._get_mfcc_windows(audios, sample_rate)
+        embeddings = self.model.m.predict(windows)
+        return self.strategy.apply(embeddings)
+
+    def embed_batch(
+        self, audios: list[list[np.ndarray]], sample_rate: int
+    ) -> list[np.ndarray]:
+        """Embed a batch of audio files from different speakers.
+        Each speaker can have multiple audio files.
+
+        Args:
+            audios (list[list[np.ndarray]]): List of speakers. Each speaker is a list of audio arrays.
+            sample_rate (int): Sample rate of the audio signals.
+
+        Returns:
+            np.ndarray: Embeddings of the audio batch.
+        """
+        # list of speakers, each speaker is a ndarray of windows
+        speaker_windows = []
+        for speaker in audios:
+            one_speaker_windows = self._get_mfcc_windows(speaker, sample_rate)
+            speaker_windows.append(one_speaker_windows)
+
+        # we want to call model.m.predict only once for all windows
+        # so we flatten the list of windows
+        # but we need to keep track of the speaker boundaries
+        speaker_boundaries = np.cumsum([len(speaker) for speaker in speaker_windows])
+        windows = np.vstack(speaker_windows)
+        embeddings = self.model.m.predict(windows)
+        # we split the embeddings back into the original speakers
+        speakers_embeds = np.split(embeddings, speaker_boundaries[:-1])
+        return [
+            self.strategy.apply(one_speaker_embeds)
+            for one_speaker_embeds in speakers_embeds
+        ]
+
+    def _get_mfcc_windows(
+        self, audios: list[np.ndarray], sample_rate: int
+    ) -> np.ndarray:
+        """Get the Mel-filterbank energy features for each audio.
+
+        Args:
+            audios (list[np.ndarray]): List of audio arrays. Each audio array is a numpy array.
+            sample_rate (int): Sample rate of the audio signals.
+
+        Returns:
+            np.ndarray: Mel-filterbank energy features for each audio.
+        """
         all_windows = [
             first_k_windows(audio, sample_rate, self.num_frames, self.k)
             for audio in audios
         ]
-        windows = np.vstack(all_windows)
-        embeddings = self.model.m.predict(windows)
-        return self.strategy.apply(embeddings)
+        return np.vstack(all_windows)
