@@ -64,16 +64,20 @@ class EmbeddingModel:
             k = 2**31 - 1
         self.k = k
 
-    def embed(self, audio: np.ndarray, sample_rate: int) -> np.ndarray:
+    def embed(self, audios: list[np.ndarray], sample_rate: int) -> np.ndarray:
         """Embed an audio file using the pre-trained model and strategy.
 
         Args:
-            audio (np.ndarray): Audio signal.
-            sample_rate (int): Sample rate of the audio.
+            audio (list[np.ndarray]): List of audio arrays. Each audio array is a numpy array.
+            sample_rate (int): Sample rate of the audio signals.
 
         Returns:
             np.ndarray: Embedding of the audio.
         """
-        windows = first_k_windows(audio, sample_rate, self.num_frames, self.k)
+        all_windows = [
+            first_k_windows(audio, sample_rate, self.num_frames, self.k)
+            for audio in audios
+        ]
+        windows = np.vstack(all_windows)
         embeddings = self.model.m.predict(windows)
         return self.strategy.apply(embeddings)
