@@ -44,15 +44,35 @@ class FAISS:
         else:
             self._metadata.extend([None] * len(vectors))
 
-    def search(self, embeddings: list, k: int) -> tuple[np.ndarray, np.ndarray]:
+    def search(
+        self, embeddings: list, k: int, threshold: float | None = None
+    ) -> tuple[list[np.ndarray], list]:
         """Search for the k nearest vectors to the given embedding.
 
         Args:
             embeddings (list): List of embeddings to search for.
             k (int): Number of nearest vectors to return.
+            threshold (float, optional): Threshold distance to filter the search results. Defaults to None.
 
         Returns:
-            tuple: Tuple of distances and metadata.
+            tuple: Tuple of `distances` and `metadata`.
+            - distances (list[np.ndarray]): Distances of the search results.
+            Distances are list of numpy arrays, because number of distances in each row can differ.
+            - metadata (list): Metadata of the search results.
+
+        Examples:
+            Create template vector store
+            >>> from kth_sr.vectorstore import FAISS
+            >>> vstore = FAISS(2)
+            >>> vstore.add([[1, 2], [3, 4]], ["a", "b"])
+
+            Search for the nearest vector to `[1, 2]`
+            >>> vstore.search([[1, 2]], 1)
+            ([array([0.]], [['a']])  # distance, metadata
+
+            Search for the 2 nearest vectors to vectors `[1, 2]` and `[3, 4]`
+            >>> vstore.search([[1, 2], [3, 4]], 2)
+            ([array([0., 8.]), array([0., 8.])], [['a', 'b'], ['b', 'a']])  # distance, metadata
         """
         if not isinstance(embeddings, np.ndarray):
             embeddings = np.array(embeddings)
@@ -60,7 +80,11 @@ class FAISS:
         distances, indices = self._vstore.search(embeddings, k)
         # indices are 2 dimensional array. Each row for each query.
         metadata = [[self._metadata[i] for i in row] for row in indices]
-        return distances, np.array(metadata)
+
+        if threshold is not None:
+            distances, metadata = self.apply_threshold(distances, metadata, threshold)
+
+        return list(distances), metadata
 
     def save(self, path: str):
         """Save the vector store to a file.
@@ -91,3 +115,46 @@ class FAISS:
         with open(dir_path / "metadata.json", "r") as f:
             vector_store._metadata = json.load(f)
         return vector_store
+
+    @classmethod
+    def apply_threshold(
+        cls, distances: np.ndarray, metadata: list, threshold: float
+    ) -> tuple[list[np.ndarray], list[np.ndarray]]:
+        """Apply threshold to the search results.
+
+        Args:
+            distances (np.ndarray): Distances of the search results.
+            metadata (list): Metadata of the search results.
+            threshold (float): Threshold to filter the search results.
+
+        Returns:
+            tuple: Tuple of `distances` and `metadata` after applying threshold.
+            - distances (list[np.ndarray]): Filtered distances.
+            Distances are list of numpy arrays, because number of distances in each row can differ.
+            - metadata (list): Filtered metadata.
+
+        Examples:
+            >>> from kth_sr.vectorstore import FAISS
+            >>> distances = [[0, 4], [0, 8]]
+            >>> metadata = [['a', 'b'], ['c', 'd']]
+            >>> FAISS.apply_threshold(distances, metadata, 5)
+            ([array([0., 4.]), array([0.])], [['a', 'b'], ['c']])  # distance, metadata
+        """
+        if len(distances) != len(metadata):
+            raise ValueError(
+                "Length of metadata should be same as length of distances."
+            )
+
+        if not isinstance(distances, np.ndarray):
+            distances = np.array(distances)
+
+        # remove the distances greater than threshold
+        distances_masked = np.where(distances <= threshold, distances, np.nan)
+        distances_filtered = [i[~np.isnan(i)] for i in distances_masked]
+
+        # remove the metadata corresponding to the distances greater than threshold
+        metadata_filtered = [
+            metadata[i][: len(row)] for i, row in enumerate(distances_filtered)
+        ]
+
+        return distances_filtered, metadata_filtered
