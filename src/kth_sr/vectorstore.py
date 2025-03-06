@@ -13,7 +13,7 @@ class FAISS:
     _metadata: list
     """Metadata for the vectors stored"""
 
-    def __init__(self, dimension):
+    def __init__(self, dimension=512):
         self._vstore = faiss.IndexFlatL2(dimension)
         self._metadata = []
 
@@ -84,10 +84,12 @@ class FAISS:
         Returns:
             FAISS: Vector store object
         """
-        dir_path = Path(path)
+        dir_path = Path(path) 
 
-        vector_store = FAISS(64)
+        vector_store = FAISS(512)
         vector_store._vstore = faiss.read_index(f"{path}/vector_store.index")
+        print("Loaded vectorstore",vector_store._vstore)
         with open(dir_path / "metadata.json", "r") as f:
             vector_store._metadata = json.load(f)
+            print("Loaded vector metadata")
         return vector_store

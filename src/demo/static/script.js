@@ -105,13 +105,22 @@ if (navigator.mediaDevices.getUserMedia) {
             let formData = new FormData();
             formData.append('audio',audioBlob);
 
+
+            output.innerHTML = "Processing...";
             fetch('/findmatch', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                output.innerHTML = data.message;
+                console.log(data)
+                if (data.status === 200) {
+                    render_celebrity_list(data.data);
+                    output.innerHTML = "";
+                } else {
+                    output.innerHTML = data.message;
+                    
+                }
             });
         }
     }
@@ -141,29 +150,36 @@ function render_celebrity_list(celebrities) {
                 </div>
      */
     celebrityList.innerHTML = '';
-
+    console.log(celebrities)
     celebrities.forEach(celebrity => {
         const celebrityItem = document.createElement('div');
         celebrityItem.classList.add('celebrity-item');
 
         const celebrityImage = document.createElement('img');
-        celebrityImage.src = `static/images/${celebrity.name}.jpg`;
-        celebrityImage.alt = celebrity.name;
+        celebrityImage.src = celebrity.image_url;
+        celebrityImage.alt = celebrity.Name;
         celebrityImage.classList.add('celebrity-image');
 
         const celebrityName = document.createElement('h3');
-        celebrityName.textContent = celebrity.name;
+        celebrityName.innerHTML = celebrity.Name.replaceAll('_', ' ');
         celebrityName.classList.add('celebrity-name');
 
         const wikiLink = document.createElement('a');
         wikiLink.href = celebrity.wiki_url;
-        wikiLink.textContent = 'View on Wikipedia';
+        wikiLink.innerHTML = 'View on Wikipedia';
         wikiLink.classList.add('wiki-link');
+
+        const audioLength = Math.floor(celebrity.start_time/1000) + 's';
+        const audioLink = document.createElement('a');
+        audioLink.href = `https://www.youtube.com/watch?v=${celebrity.video}&t=${audioLength}`;
+        audioLink.target = '_blank';
+        audioLink.innerHTML = 'Listen to Audio';
+        audioLink.classList.add('wiki-link');
 
         celebrityItem.appendChild(celebrityImage);
         celebrityItem.appendChild(celebrityName);
         celebrityItem.appendChild(wikiLink);
-
+        celebrityItem.appendChild(audioLink);
         celebrityList.appendChild(celebrityItem);
     });
 }

@@ -8,6 +8,8 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
+  
+        </div>
         <div class="recorder-container">
             <div class="icon-container">
                 <canvas id="visualizer" width="750" height="750" class="visualizer"></canvas>
@@ -25,17 +27,11 @@
         </div>
         <div class="results-card">
             <div class="celebrity-list" id="celebrityList">
-                <!-- Celebrity items will be dynamically added here by JavaScript 
-                <div class="celebrity-item">
-                    <img src="{{ url_for('static', filename='images/celebrity1.jpg') }}" alt="Celebrity 1" class="celebrity-image">
-                    <h3 class="celebrity-name">Celebrity 1</h3>
-                    <a href="#" class="wiki-link">View on Wikipedia</a>
-                </div>
-                -->
             </div>
         </div>
 
         
         <script src="{{ url_for('static', filename='script.js') }}"></script>
+       
     </body>
 </html>
