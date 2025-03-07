@@ -73,6 +73,27 @@ def get_wiki_info(name: str) -> dict:
         print(f"Error searching Wikipedia for {name}: {e}")
         return {'image_url': "", 'wiki_description': "", 'wiki_url':""}
 
+def append_data():
+    cache_path = "./data/celeb_data_with_wiki.csv"
+    og = ""
+    if os.path.exists(cache_path):
+        og = pd.read_csv(cache_path)
+    
+    df_videos = pd.read_csv("./data/celebs_dev.csv")
+
+    og = og.drop(columns=['video','start_time'])
+    df_videos = df_videos.drop(columns=['end_time','length', 'txt_file'])
+    
+    merged_df = og.merge(
+        df_videos[['speaker', 'video', 'start_time']],
+        left_on='VoxCeleb2_ID',
+        right_on='speaker',
+        how='left'
+    ).drop_duplicates(subset=['VoxCeleb2_ID'], keep='first')\
+
+    merged_df.to_csv(cache_path, index=False)
+    return ""
+
 def get_celeb_data(path_to_known_ids: str):
 
     cache_path = "./data/celeb_data_with_wiki.csv"
@@ -91,7 +112,6 @@ def get_celeb_data(path_to_known_ids: str):
     filtered_df = df_with_names[df_with_names['VoxCeleb2_ID'].isin(id_list)]
     filterd_dev = df_dev[df_dev['speaker'].isin(id_list)]
     
-    # Join the video and start_time columns from filterd_dev to filter_df based on the isntances where VoxCeleb2_ID is qeual to speaker, if there are multiple, just use the first
     merged_df = filtered_df.merge(
         filterd_dev[['speaker', 'video', 'start_time']],
         left_on='VoxCeleb2_ID',
