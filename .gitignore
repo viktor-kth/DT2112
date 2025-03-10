@@ -10,6 +10,7 @@ data/*
 !data/vox2_meta.csv
 !data/test.csv
 !data/dev.csv
+!data/celebs_dev.csv
 .DS_Store
 
 *.zip

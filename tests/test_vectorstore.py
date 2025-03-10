@@ -22,6 +22,21 @@ def test_add_vectors(dimension, array, metadata):
     assert vstore._vstore.ntotal == len(array)
 
 
+@pytest.mark.parametrize(
+    "dimension, array, metadata",
+    [
+        (3, [[1, 2], [3, 4]], ["a", "b"]),  # invalid dimension (AssertionError)
+        (2, [[1, 2], [3, 4]], ["a"]),  # invalid metadata
+        (2, [[1, 2]], ["a", "b"]),  # invalid metadata
+    ],
+)
+def test_add_vectors_invalid(dimension, array, metadata):
+    vstore = FAISS(dimension)
+    # raises ValueError or AssertionError
+    with pytest.raises((ValueError, AssertionError)):
+        vstore.add(array, metadata)
+
+
 def test_save_load():
     tmp_path = "./tmp_faiss"
     vectors = np.array([[1, 2], [3, 4]])
@@ -63,5 +78,33 @@ def test_search(
 ):
     vstore = FAISS(dimension)
     vstore.add(vectors, metadata)
-    _, metadata = vstore.search(queries, k)
+    distances, metadata = vstore.search(queries, k)
+    assert isinstance(metadata, list)
+    assert isinstance(distances, list)
     assert metadata == expected_metadata
+
+
+@pytest.mark.parametrize(
+    "distances, metadata, threshold, expected_metadata",
+    [
+        (np.array([[0, 1], [2, 3]]), [["a", "b"], ["c", "d"]], 1.5, [["a", "b"], []]),
+        (np.array([[0, 2], [1, 3]]), [["a", "b"], ["c", "d"]], 1.5, [["a"], ["c"]]),
+    ],
+)
+def test_threshold_search(distances, metadata, threshold, expected_metadata):
+    distances_filtered, metadata_filtered = FAISS.apply_threshold(
+        distances, metadata, threshold
+    )
+
+    assert isinstance(metadata_filtered, list)
+    assert isinstance(distances_filtered, list)
+    # check dimension 0
+    assert len(metadata_filtered) == len(expected_metadata)
+    assert len(distances_filtered) == len(expected_metadata)
+    # check dimensions 1
+    for i, m in enumerate(metadata_filtered):
+        # check each metadata row
+        assert (m == np.array(expected_metadata[i])).all()
+        # check each distance row
+        assert (distances_filtered[i] <= threshold).all()
+        assert len(m) == len(distances_filtered[i])
