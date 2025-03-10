@@ -19,6 +19,8 @@ dependencies = [
     "tensorflow==2.14.0",
     "gdown",
     "faiss-cpu",
+    # Demo
+    "flask",
 ]
 
 [project.optional-dependencies]

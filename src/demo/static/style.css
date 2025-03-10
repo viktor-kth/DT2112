@@ -1,0 +1,143 @@
+body {
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgb(211, 211, 211) 100%);
+    height: fit-content;
+    min-height: 100vh;
+    width: 100vw;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+
+}
+
+p{
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    text-align: center;
+}
+
+.recorder-container {
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top: auto;
+}
+
+
+.record-btn {
+    color: #000000;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 10px 10px;
+    border-radius: 50%;
+    width: 250px;
+    height: 250px;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    z-index: 100;
+    background-color: #dddddd;
+    
+}
+
+.visualizer {
+    position: absolute;
+    width: 750px;
+    height: 750px;
+    max-width: 100%;
+    max-height: 100%;
+    image-rendering: pixelated;
+    z-index: -1;
+}
+.record-btn:hover, .record-btn:active {
+    transform: scale(1.05);
+   
+}
+
+.record-btn:focus {
+    outline: none;
+}
+
+.icon-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+
+
+.results-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    max-width: 800px;
+    border-radius: 10px 10px 0 0;
+    margin: 0 auto;
+}
+
+.celebrity-list {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.celebrity-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    min-width: 200px;
+    max-width: 200px;
+    transition: transform 0.2s;
+}
+
+.celebrity-item:hover {
+    transform: translateY(-5px);
+}
+
+.celebrity-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    aspect-ratio: keep-aspect-ratio;
+    margin-bottom: 10px;
+}
+
+.celebrity-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.wiki-link {
+    color: #333;
+    text-decoration: none;
+}
+
+.wiki-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.audio-link {
+    color: #333;
+    text-decoration: none;
+}
