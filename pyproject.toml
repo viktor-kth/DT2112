@@ -21,6 +21,7 @@ dependencies = [
     "faiss-cpu",
     # Demo
     "flask",
+    "wptools",
 ]
 
 [project.optional-dependencies]
