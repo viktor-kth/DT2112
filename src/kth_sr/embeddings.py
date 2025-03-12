@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import gdown
 from deep_speaker.conv_models import DeepSpeakerModel
 

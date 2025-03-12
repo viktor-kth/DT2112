@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, jsonify
 import tempfile
-import pandas as pd
-import librosa
 from pathlib import Path
-from kth_sr import embeddings, FAISS, loaddata, first_k_windows
+
+import librosa
+import pandas as pd
+from flask import Flask, jsonify, render_template, request
+
+from kth_sr import FAISS, embeddings, first_k_windows, loaddata
 
 # Note to run this file do
 
