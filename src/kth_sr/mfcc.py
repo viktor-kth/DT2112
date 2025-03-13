@@ -1,6 +1,6 @@
-import numpy as np
-from deep_speaker.audio import pad_mfcc, mfcc_fbank
 import librosa
+import numpy as np
+from deep_speaker.audio import mfcc_fbank, pad_mfcc
 
 
 def first_k_windows(audio, sample_rate: int, num_frames: int, k: int = 5):

@@ -1,7 +1,9 @@
-from kth_sr.vectorstore import FAISS
+import shutil
+
 import numpy as np
 import pytest
-import shutil
+
+from kth_sr.vectorstore import FAISS
 
 
 @pytest.mark.parametrize(

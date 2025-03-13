@@ -1,7 +1,9 @@
 from __future__ import annotations
-import faiss
-from pathlib import Path
+
 import json
+from pathlib import Path
+
+import faiss
 import numpy as np
 
 
@@ -108,11 +110,11 @@ class FAISS:
         Returns:
             FAISS: Vector store object
         """
-        dir_path = Path(path) 
+        dir_path = Path(path)
 
         vector_store = FAISS(512)
         vector_store._vstore = faiss.read_index(f"{path}/vector_store.index")
-        print("Loaded vectorstore",vector_store._vstore)
+        print("Loaded vectorstore", vector_store._vstore)
         with open(dir_path / "metadata.json", "r") as f:
             vector_store._metadata = json.load(f)
             print("Loaded vector metadata")
