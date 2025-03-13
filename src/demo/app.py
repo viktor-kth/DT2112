@@ -61,7 +61,6 @@ def findmatch():
                 {
                     "status": 200,
                     "message": "File processed successfully",
-                    "distances": distances.tolist(),
                     "data": filterd_dev.to_dict(orient="records"),
                 }
             )
