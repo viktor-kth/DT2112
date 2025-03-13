@@ -69,3 +69,7 @@ def findmatch():
         except Exception as e:
             print("Error processing audio:", str(e))  # Debug info
             return jsonify({"status": 500, "message": str(e)})
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
